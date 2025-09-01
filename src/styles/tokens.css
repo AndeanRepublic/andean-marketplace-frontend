@@ -1,0 +1,49 @@
+:root {
+    /* Neutral */
+  --Neutral-900: #1A1A1A;
+  --Gray-900: #191919;
+
+  /* Display/Display xl */
+  --Display-Display-xl-Font-Family: "Black Marker", cursive, sans-serif;
+  --Display-Display-xl-Font-Size: 100px;
+  --Display-Display-xl-Font-Weight: 400;
+  --Display-Display-xl-Line-Height: 115%;
+  --Display-Display-xl-Letter-Spacing: 0;
+
+  /* Body/Body xl (regular) */
+  --body-body-xl-r-font-family: "Montserrat", sans-serif;
+  --body-body-xl-r-font-size: 24px;
+  --body-body-xl-r-font-weight: 400;
+  --body-body-xl-r-line-height: 145%;
+  --body-body-xl-r-letter-spacing: 0;
+  /* Colores base */
+  --base-info-100: 204 229 253;
+  --base-info-200: 153 204 251;
+  --base-info-300: 102 176 249;
+
+  --base-error-100: 253 208 213;
+  --base-error-200: 250 160 171;
+  --base-error-300: 248 113 129;
+
+  --base-success-400: 69 212 112;
+
+  --white: 255 255 255;
+  --black: 0 0 0;
+
+  /* Espaciado */
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-7xl: 80px;
+  --spacing-9xl: 140px;
+
+  /* Radius */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-2xl: 24px;
+  --radius-3xl: 28px;
+  --radius-full: 9999px;
+
+  /* Tipografía */
+  --font-sans: "Montserrat", sans-serif;
+}

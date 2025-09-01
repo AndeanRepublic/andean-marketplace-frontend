@@ -1,0 +1,114 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
+/**
+ * Revela una foto de fondo usando una máscara SVG con forma de chakana.
+ * - No agrega espacio extra (usa pin).
+ * - El scroll solo “alimenta” la expansión de la máscara.
+ */
+export default function ChakanaReveal() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const shapeRef = useRef<SVGGElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Calcula el scale necesario para cubrir el viewport
+      const computeScaleToCover = () => {
+        const svg = sectionRef.current!.querySelector("svg") as SVGSVGElement;
+        const vb = svg.viewBox.baseVal; // 0 0 473 474
+        const maxViewSide = Math.max(vb.width, vb.height);
+        const vpMax = Math.max(window.innerWidth, window.innerHeight);
+        return (vpMax * 1.25) / maxViewSide; // 1.25 = margen de seguridad
+      };
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "+=140%",
+          scrub: true,
+          pin: true,
+          anticipatePin: 1,
+        },
+        defaults: { ease: "none" },
+      });
+
+      // Estado inicial
+      gsap.set(shapeRef.current, {
+        // centramos el path en el medio del viewport
+        xPercent: -50,
+        yPercent: -50,
+        transformOrigin: "50% 50%",
+        scale: 0.9, // tamaño de arranque
+      });
+
+      // Animación: la máscara crece hasta cubrir
+      tl.to(shapeRef.current, {
+        scale: computeScaleToCover,
+        duration: 1,
+      });
+
+      // Recalcular en resize
+      const onResize = () => {
+        gsap.set(shapeRef.current, { scale: computeScaleToCover() });
+      };
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      className="
+        relative min-h-[100svh]
+        overflow-hidden
+      "
+      aria-label="Chakana Reveal"
+    >
+      {/* Foto detrás (full-bleed) */}
+      <img
+        src="/img/mainImg.png"
+        alt=""
+        className="absolute inset-0 -z-10 h-full w-full object-cover"
+      />
+
+      {/* SVG máscara que “corta” la capa superior (patrón) */}
+      <svg
+        className="absolute inset-0 h-full w-full"
+        viewBox="0 0 473 474"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        {/* Máscara: negro = tapa, blanco = se ve (revela la foto detrás) */}
+        <mask id="revealMask" maskUnits="userSpaceOnUse">
+          <rect width="100%" height="100%" fill="black" />
+          {/* El g se escala con GSAP */}
+          <g ref={shapeRef} transform={`translate(50% 50%)`}>
+            <path
+              d="M47.2789 177.655H12.1852C5.55776 177.655 0.185181 183.028 0.185181 189.655V283.843C0.185181 290.47 5.55775 295.843 12.1852 295.843H47.2789C53.9063 295.843 59.2789 301.215 59.2789 307.843V342.936C59.2789 349.564 64.6514 354.936 71.2789 354.936H106.373C113 354.936 118.373 360.309 118.373 366.936V402.03C118.373 408.658 123.745 414.03 130.373 414.03H165.466C172.094 414.03 177.466 419.403 177.466 426.03V461.124C177.466 467.751 182.839 473.124 189.466 473.124H283.654C290.281 473.124 295.654 467.751 295.654 461.124V426.03C295.654 419.403 301.026 414.03 307.654 414.03H342.747C349.375 414.03 354.747 408.658 354.747 402.03V366.936C354.747 360.309 360.12 354.936 366.747 354.936H401.841C408.468 354.936 413.841 349.564 413.841 342.936V307.843C413.841 301.215 419.214 295.843 425.841 295.843H460.935C467.562 295.843 472.935 290.47 472.935 283.843V189.655C472.935 183.028 467.562 177.655 460.935 177.655H425.841C419.214 177.655 413.841 172.283 413.841 165.655V130.562C413.841 123.934 408.468 118.562 401.841 118.562H366.747C360.12 118.562 354.747 113.189 354.747 106.562V71.468C354.747 64.8406 349.375 59.468 342.747 59.468H307.654C301.026 59.468 295.654 54.0954 295.654 47.468V12.3743C295.654 5.74688 290.281 0.374298 283.654 0.374298H189.466C182.839 0.374298 177.466 5.74687 177.466 12.3743V47.468C177.466 54.0954 172.094 59.468 165.466 59.468H130.373C123.745 59.468 118.373 64.8406 118.373 71.468V106.562C118.373 113.189 113 118.562 106.373 118.562H71.2789C64.6515 118.562 59.2789 123.934 59.2789 130.562V165.655C59.2789 172.283 53.9063 177.655 47.2789 177.655Z"
+              fill="white"
+            />
+          </g>
+        </mask>
+
+        {/* Capa superior: el patrón que “tapa” y se va recortando por la máscara */}
+        <image
+          href="/img/HeroSection_bg.png"
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMid slice"
+          mask="url(#revealMask)"
+        />
+      </svg>
+    </section>
+  );
+}
